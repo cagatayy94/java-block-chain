@@ -5,32 +5,29 @@ import java.util.Date;
 import java.util.List;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.io.BaseEncoding;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class Blockchain {
 
-    private List<Block> chain;
+    public List<Block> chain;
 
     public Blockchain() {
-        this.chain = new ArrayList<>();
-        this.createBlock(1, "0");
+        chain = new ArrayList<>();
+        createBlock(1, "0");
     }
 
     public Block createBlock(int proof, String previousHash) {
         Block block = new Block();
-        block.setIndex(this.chain.size() + 1);
+        block.setIndex(chain.size() + 1);
         block.setTimestamp(new Date().toString());
         block.setPreviousHash(previousHash);
         block.setProof(proof);
-        this.chain.add(block);
+        chain.add(block);
         return block;
     }
 
     public Block getPreviousBlock() {
-        return this.chain.get(this.chain.size() - 1);
+        return chain.get(chain.size() - 1);
     }
 
     public int proofOfWork(int previousProof) {
@@ -62,14 +59,10 @@ public class Blockchain {
         String encodedBlock = "";
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            String jsonBlock = ow.writeValueAsString(block);
-            byte[] digest = md.digest(String.valueOf(jsonBlock).getBytes());
+            byte[] digest = md.digest(String.valueOf(block.mapToJson()).getBytes());
             encodedBlock = BaseEncoding.base16().lowerCase().encode(digest);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
 
         return encodedBlock;
