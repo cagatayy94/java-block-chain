@@ -1,22 +1,28 @@
-package com.example.blockchainjava;
+package com.example.blockchainjava.entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import com.google.common.io.BaseEncoding;
 
 public class Blockchain {
 
     public List<Block> chain;
+    public List<Transaction> transactions;
+
+    public Collection nodes;
 
     public Blockchain() {
         chain = new ArrayList<>();
-        createBlock(1, "0");
+        createBlock(1, "0", null);
+        this.transactions.clear();
+
     }
 
-    public Block createBlock(int proof, String previousHash) {
+    public Block createBlock(int proof, String previousHash, List<Transaction> transactions) {
         Block block = new Block();
         block.setIndex(chain.size() + 1);
         block.setTimestamp(new Date().toString());
@@ -98,5 +104,29 @@ public class Blockchain {
             blockIndex += 1;
         }
         return true;
+    }
+
+    public int addTransactions(String sender, String receiver, String amount){
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setReceiver(receiver);
+        transaction.setSender(sender);
+        transactions.add(transaction);
+        return getPreviousBlock().getIndex()+1;
+    }
+
+    public void addNode(String address){
+        try {
+            URL url = new URL(address);
+            if (!this.nodes.stream().anyMatch(x -> x == url)){
+             this.nodes.add(url);
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void replaceChain(){
+        
     }
 }

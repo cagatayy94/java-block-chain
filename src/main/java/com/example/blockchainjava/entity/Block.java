@@ -1,4 +1,4 @@
-package com.example.blockchainjava;
+package com.example.blockchainjava.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
