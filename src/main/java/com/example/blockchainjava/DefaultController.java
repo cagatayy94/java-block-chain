@@ -25,7 +25,7 @@ public class DefaultController {
     }
 
     @GetMapping("chain")
-    public ResponseEntity<?> getChain(){
+    public ResponseEntity<ChainResponse> getChain(){
         ChainResponse chainResponse = new ChainResponse();
         chainResponse.setChain(blockchain.chain);
         chainResponse.setLength((long) blockchain.chain.size());
