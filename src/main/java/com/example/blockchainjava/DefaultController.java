@@ -20,7 +20,7 @@ public class DefaultController {
         int previousProof = previousBlock.getProof();
         int proof = blockchain.proofOfWork(previousProof);
         String previousHash = blockchain.hash(previousBlock);
-        Block block = blockchain.createBlock(proof, previousHash, this.blockchain.transactions);
+        Block block = blockchain.createBlock(proof, previousHash);
         return ResponseEntity.ok(block.mapToJson());
     }
 

@@ -19,14 +19,14 @@ public class Blockchain {
 
     public Blockchain() {
         chain = new ArrayList<>();
-        createBlock(1, "0", null);
+        createBlock(1, "0");
 
         if (this.transactions != null){
             this.transactions.clear();
         }
     }
 
-    public Block createBlock(int proof, String previousHash, List<Transaction> transactions) {
+    public Block createBlock(int proof, String previousHash) {
         Block block = new Block();
         block.setIndex(chain.size() + 1);
         block.setTimestamp(new Date().toString());
