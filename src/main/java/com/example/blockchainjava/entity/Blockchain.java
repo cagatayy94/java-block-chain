@@ -126,24 +126,33 @@ public class Blockchain {
         }
     }
 
-    public void replaceChain(){
+    public boolean replaceChain(){
         Collection<URL> nodes = this.nodes;
-        Object longestChain = null;
+        List<Block> longestChain = null;
         Long maxLength = (long) this.chain.size();
+        Long length = 0L;
 
-        nodes.forEach(url -> {
+        for (URL url:nodes) {
             String address = url.getAuthority()+"/api/chain";
 
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.getForEntity(address, String.class);
+            ResponseEntity<ChainResponse> response = restTemplate.getForEntity(address, ChainResponse.class);
 
             if (response.getStatusCode() == HttpStatusCode.valueOf(200)){
-                System.out.println(response.getBody());
+                length = response.getBody().length;
+                chain = response.getBody().chain;
+                if (length > maxLength && isChainValid(chain)){
+                    maxLength = length;
+                    longestChain = chain;
+                }
             }
+        }
 
-        });
+        if (longestChain != null){
+            this.chain = longestChain;
+            return true;
+        }
 
-
-        
+        return false;
     }
 }
