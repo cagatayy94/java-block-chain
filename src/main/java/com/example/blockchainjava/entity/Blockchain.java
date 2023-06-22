@@ -110,11 +110,7 @@ public class Blockchain {
         return true;
     }
 
-    public int addTransactions(String sender, String receiver, String amount){
-        Transaction transaction = new Transaction();
-        transaction.setAmount(amount);
-        transaction.setReceiver(receiver);
-        transaction.setSender(sender);
+    public int addTransaction(Transaction transaction){
         transactions.add(transaction);
         return getPreviousBlock().getIndex()+1;
     }
