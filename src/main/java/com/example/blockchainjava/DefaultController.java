@@ -1,5 +1,8 @@
 package com.example.blockchainjava;
 
+import com.example.blockchainjava.entity.Block;
+import com.example.blockchainjava.entity.Blockchain;
+import com.example.blockchainjava.entity.ChainResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,13 +20,16 @@ public class DefaultController {
         int previousProof = previousBlock.getProof();
         int proof = blockchain.proofOfWork(previousProof);
         String previousHash = blockchain.hash(previousBlock);
-        Block block = blockchain.createBlock(proof, previousHash);
+        Block block = blockchain.createBlock(proof, previousHash, this.blockchain.transactions);
         return ResponseEntity.ok(block.mapToJson());
     }
 
-    @GetMapping("get_chain")
+    @GetMapping("chain")
     public ResponseEntity<?> getChain(){
-        return ResponseEntity.ok(blockchain.chain);
+        ChainResponse chainResponse = new ChainResponse();
+        chainResponse.setChain(blockchain.chain);
+        chainResponse.setLength((long) blockchain.chain.size());
+        return ResponseEntity.ok(chainResponse);
     }
 
     @GetMapping("is_valid")

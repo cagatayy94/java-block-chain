@@ -7,19 +7,23 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import com.google.common.io.BaseEncoding;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 public class Blockchain {
 
     public List<Block> chain;
     public List<Transaction> transactions;
-
-    public Collection nodes;
+    public Collection<URL> nodes;
 
     public Blockchain() {
         chain = new ArrayList<>();
         createBlock(1, "0", null);
-        this.transactions.clear();
 
+        if (this.transactions != null){
+            this.transactions.clear();
+        }
     }
 
     public Block createBlock(int proof, String previousHash, List<Transaction> transactions) {
@@ -118,8 +122,8 @@ public class Blockchain {
     public void addNode(String address){
         try {
             URL url = new URL(address);
-            if (!this.nodes.stream().anyMatch(x -> x == url)){
-             this.nodes.add(url);
+            if (this.nodes.stream().noneMatch(x -> x == url)){
+                this.nodes.add(url);
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -127,6 +131,23 @@ public class Blockchain {
     }
 
     public void replaceChain(){
+        Collection<URL> nodes = this.nodes;
+        Object longestChain = null;
+        Long maxLength = (long) this.chain.size();
+
+        nodes.forEach(url -> {
+            String address = url.getAuthority()+"/api/chain";
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.getForEntity(address, String.class);
+
+            if (response.getStatusCode() == HttpStatusCode.valueOf(200)){
+                System.out.println(response.getBody());
+            }
+
+        });
+
+
         
     }
 }
