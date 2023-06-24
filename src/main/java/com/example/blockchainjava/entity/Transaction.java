@@ -1,6 +1,8 @@
 package com.example.blockchainjava.entity;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +13,7 @@ public class Transaction {
     String sender;
     @NotBlank(message = "Receiver is mandatory")
     String receiver;
-    @NotBlank(message = "Amount is mandatory")
-    String amount;
+    @Min(value = 0, message = "The value must be positive")
+    @NotNull(message = "Amount is mandatory")
+    Integer amount;
 }
