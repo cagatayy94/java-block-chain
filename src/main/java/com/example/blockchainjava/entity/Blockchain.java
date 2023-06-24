@@ -18,12 +18,9 @@ public class Blockchain {
     public Collection<URL> nodes;
 
     public Blockchain() {
-        chain = new ArrayList<>();
+        this.chain = new ArrayList<>();
+        this.transactions = new ArrayList<>();
         createBlock(1, "0");
-
-        if (this.transactions != null){
-            this.transactions.clear();
-        }
     }
 
     public Block createBlock(int proof, String previousHash) {
