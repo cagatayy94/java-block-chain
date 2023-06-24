@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class Block {
@@ -13,6 +15,7 @@ public class Block {
     public String timestamp;
     public int proof;
     public String previousHash;
+    public List<Transaction> transactions;
 
     public String mapToJson(){
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
