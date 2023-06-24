@@ -2,23 +2,22 @@ package com.example.blockchainjava;
 
 import com.example.blockchainjava.entity.Block;
 import com.example.blockchainjava.entity.Blockchain;
-import com.example.blockchainjava.entity.ChainResponse;
+import com.example.blockchainjava.entity.response.ChainResponse;
 import com.example.blockchainjava.entity.Transaction;
+import com.example.blockchainjava.entity.response.ConnectNodeResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URL;
+import java.util.*;
 
-@RestController
 @RequestMapping("/api/")
-public class DefaultController {
+@RestController
+public class DefaultController extends ControllerAdvice{
 
     Blockchain blockchain = new Blockchain();
+    UUID nodeAddress = UUID.randomUUID();
 
     @GetMapping("mine_block")
     public ResponseEntity<?> mineBlock(){
@@ -26,7 +25,15 @@ public class DefaultController {
         int previousProof = previousBlock.getProof();
         int proof = blockchain.proofOfWork(previousProof);
         String previousHash = blockchain.hash(previousBlock);
-        Block block = blockchain.createBlock(proof, previousHash);
+        Transaction transaction = new Transaction();
+        transaction.setSender(nodeAddress.toString());
+        transaction.setReceiver("Cagatay");
+        transaction.setAmount(10);
+
+        blockchain.addTransaction(transaction);
+
+        List<Transaction> transactions = previousBlock.getTransactions();
+        Block block = blockchain.createBlock(proof, previousHash, transactions);
         return ResponseEntity.ok(block.mapToJson());
     }
 
@@ -49,24 +56,29 @@ public class DefaultController {
         }
     }
 
-    @PostMapping("transaction")
-    public ResponseEntity<?> add(@RequestBody @Valid Transaction transaction){
+    @PostMapping("add_transaction")
+    public ResponseEntity<?> addTransaction(@RequestBody @Valid Transaction transaction){
         int index = blockchain.addTransaction(transaction);
         String message = "This transaction will be added to Block: " + index;
         return ResponseEntity.ok(message);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
-    }
+    @PostMapping("connect_node")
+    public ResponseEntity<ConnectNodeResponse> connectNode(@RequestBody @Valid List<URL> nodes){
+        ConnectNodeResponse response = new ConnectNodeResponse();
 
+        if (nodes == null){
+            response.setMessage("No node found on this request");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        for (URL node: nodes) {
+            blockchain.addNode(node);
+        }
+
+        response.setMessage("All nodes are now connected The Cacoin now contains the following nodes: ");
+        response.setNodes(nodes);
+
+        return ResponseEntity.ok(response) ;
+    }
 }

@@ -1,11 +1,11 @@
 package com.example.blockchainjava.entity;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.example.blockchainjava.entity.response.ChainResponse;
 import com.google.common.io.BaseEncoding;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +20,16 @@ public class Blockchain {
     public Blockchain() {
         this.chain = new ArrayList<>();
         this.transactions = new ArrayList<>();
-        createBlock(1, "0");
+        createBlock(1, "0", transactions);
     }
 
-    public Block createBlock(int proof, String previousHash) {
+    public Block createBlock(int proof, String previousHash, List<Transaction> transactions) {
         Block block = new Block();
         block.setIndex(chain.size() + 1);
         block.setTimestamp(new Date().toString());
         block.setPreviousHash(previousHash);
         block.setProof(proof);
+        block.setTransactions(transactions);
         chain.add(block);
         return block;
     }
@@ -42,8 +43,7 @@ public class Blockchain {
         boolean checkProof = false;
         while (!checkProof) {
 
-            MessageDigest md = null;
-            String encodedBlock = "";
+            MessageDigest md;
             try {
                 md = MessageDigest.getInstance("SHA-256");
             } catch (NoSuchAlgorithmException e) {
@@ -52,7 +52,7 @@ public class Blockchain {
             byte[] digest = md.digest(String.valueOf(newProof * newProof - previousProof * previousProof).getBytes());
 
             String hashOperation = BaseEncoding.base16().lowerCase().encode(digest);
-            if (hashOperation.substring(0, 4).equals("0000")) {
+            if (hashOperation.startsWith("0000")) {
                 checkProof = true;
             } else {
                 newProof += 1;
@@ -87,8 +87,7 @@ public class Blockchain {
             int proof = block.getProof();
 
 
-            MessageDigest md = null;
-            String encodedBlock = "";
+            MessageDigest md;
             try {
                 md = MessageDigest.getInstance("SHA-256");
             } catch (NoSuchAlgorithmException e) {
@@ -98,7 +97,7 @@ public class Blockchain {
 
             String hashOperation = BaseEncoding.base16().lowerCase().encode(digest);
 
-            if (!hashOperation.substring(0, 4).equals("0000")) {
+            if (!hashOperation.startsWith("0000")) {
                 return false;
             }
             previousBlock = block;
@@ -112,14 +111,9 @@ public class Blockchain {
         return getPreviousBlock().getIndex()+1;
     }
 
-    public void addNode(String address){
-        try {
-            URL url = new URL(address);
-            if (this.nodes.stream().noneMatch(x -> x == url)){
-                this.nodes.add(url);
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+    public void addNode(URL url){
+        if (this.nodes.stream().noneMatch(x -> x == url)){
+            this.nodes.add(url);
         }
     }
 
@@ -127,7 +121,7 @@ public class Blockchain {
         Collection<URL> nodes = this.nodes;
         List<Block> longestChain = null;
         Long maxLength = (long) this.chain.size();
-        Long length = 0L;
+        Long length;
 
         for (URL url:nodes) {
             String address = url.getAuthority()+"/api/chain";
