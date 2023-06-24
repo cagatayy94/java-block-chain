@@ -43,15 +43,10 @@ public class Blockchain {
         boolean checkProof = false;
         while (!checkProof) {
 
-            MessageDigest md;
-            try {
-                md = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
+            MessageDigest md = getMessageDigest();
             byte[] digest = md.digest(String.valueOf(newProof * newProof - previousProof * previousProof).getBytes());
-
             String hashOperation = BaseEncoding.base16().lowerCase().encode(digest);
+
             if (hashOperation.startsWith("0000")) {
                 checkProof = true;
             } else {
@@ -62,16 +57,18 @@ public class Blockchain {
         return newProof;
     }
 
-    public String hash(Block block) {
-        String encodedBlock = "";
+    public MessageDigest getMessageDigest(){
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(String.valueOf(block.mapToJson()).getBytes());
-            encodedBlock = BaseEncoding.base16().lowerCase().encode(digest);
+            return MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+    }
 
+    public String hash(Block block) {
+        MessageDigest md = getMessageDigest();
+        byte[] digest = md.digest(String.valueOf(block.mapToJson()).getBytes());
+        String encodedBlock = BaseEncoding.base16().lowerCase().encode(digest);
         return encodedBlock;
     }
 
@@ -87,14 +84,8 @@ public class Blockchain {
             int proof = block.getProof();
 
 
-            MessageDigest md;
-            try {
-                md = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
+            MessageDigest md = getMessageDigest();
             byte[] digest = md.digest(String.valueOf(proof * proof - previousProof * previousProof).getBytes());
-
             String hashOperation = BaseEncoding.base16().lowerCase().encode(digest);
 
             if (!hashOperation.startsWith("0000")) {
