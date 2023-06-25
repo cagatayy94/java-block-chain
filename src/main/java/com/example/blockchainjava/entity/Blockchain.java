@@ -20,6 +20,7 @@ public class Blockchain {
     public Blockchain() {
         this.chain = new ArrayList<>();
         this.transactions = new ArrayList<>();
+        this.nodes = new ArrayList<>();
         createBlock(1, "0", transactions);
     }
 
