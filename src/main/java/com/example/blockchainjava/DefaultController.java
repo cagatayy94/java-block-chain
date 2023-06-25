@@ -64,6 +64,7 @@ public class DefaultController extends ControllerAdvice{
         }
     }
 
+    //# TODO create validation for
     @PostMapping("add_transaction")
     public ResponseEntity<?> addTransaction(@RequestBody @Valid Transaction transaction){
         int index = blockchain.addTransaction(transaction);
