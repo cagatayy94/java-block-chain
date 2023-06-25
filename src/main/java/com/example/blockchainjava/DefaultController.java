@@ -17,7 +17,11 @@ import java.util.*;
 @RestController
 public class DefaultController extends ControllerAdvice{
 
-    Blockchain blockchain = new Blockchain();
+    final Blockchain blockchain;
+
+    public DefaultController(){
+        this.blockchain = new Blockchain();
+    }
     UUID nodeAddress = UUID.randomUUID();
 
     @GetMapping("mine_block")
@@ -31,10 +35,10 @@ public class DefaultController extends ControllerAdvice{
         transaction.setReceiver("Cagatay");
         transaction.setAmount(10);
 
-        blockchain.addTransaction(transaction);
+        List<Transaction> transactionsForThisBlock = new ArrayList(blockchain.getTransactions());
+        transactionsForThisBlock.add(transaction);
 
-        List<Transaction> transactions = previousBlock.getTransactions();
-        Block block = blockchain.createBlock(proof, previousHash, transactions);
+        Block block = blockchain.createBlock(proof, previousHash, transactionsForThisBlock);
         return ResponseEntity.ok(block.mapToJson());
     }
 

@@ -39,6 +39,10 @@ public class Blockchain {
         return chain.get(chain.size() - 1);
     }
 
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
     public int proofOfWork(int previousProof) {
         int newProof = 1;
         boolean checkProof = false;
