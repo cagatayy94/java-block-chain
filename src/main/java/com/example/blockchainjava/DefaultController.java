@@ -7,6 +7,8 @@ import com.example.blockchainjava.entity.response.ChainResponse;
 import com.example.blockchainjava.entity.Transaction;
 import com.example.blockchainjava.entity.response.ConnectNodeResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +21,14 @@ public class DefaultController extends ControllerAdvice{
 
     final Blockchain blockchain;
 
-    public DefaultController(){
+    @Autowired
+    private Environment env;
+
+    public DefaultController(Environment env){
         this.blockchain = new Blockchain();
+        this.env = env;
+        this.blockchain.setMiner(env.getProperty("the.miner.of.this.node"));
     }
-    UUID nodeAddress = UUID.randomUUID();
 
     @GetMapping("mine_block")
     public ResponseEntity<?> mineBlock(){
@@ -30,13 +36,10 @@ public class DefaultController extends ControllerAdvice{
         int previousProof = previousBlock.getProof();
         int proof = blockchain.proofOfWork(previousProof);
         String previousHash = blockchain.hash(previousBlock);
-        Transaction transaction = new Transaction();
-        transaction.setSender(nodeAddress.toString());
-        transaction.setReceiver("Cagatay");
-        transaction.setAmount(10);
 
         List<Transaction> transactionsForThisBlock = new ArrayList(blockchain.getTransactions());
-        transactionsForThisBlock.add(transaction);
+        blockchain.setMinerFee(transactionsForThisBlock);
+        blockchain.getTransactions().clear();
 
         Block block = blockchain.createBlock(proof, previousHash, transactionsForThisBlock);
         return ResponseEntity.ok(block.mapToJson());

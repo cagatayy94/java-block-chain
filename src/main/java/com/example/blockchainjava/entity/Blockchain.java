@@ -16,6 +16,15 @@ public class Blockchain {
     public List<Block> chain;
     public List<Transaction> transactions;
     public Collection<URL> nodes;
+    public String miner;
+
+    public void setMiner(String miner) {
+        this.miner = miner;
+    }
+
+
+
+    UUID nodeAddress = UUID.randomUUID();
 
     public Blockchain() {
         this.chain = new ArrayList<>();
@@ -142,4 +151,13 @@ public class Blockchain {
 
         return false;
     }
+
+    public void setMinerFee(List<Transaction> transactions){
+        Transaction transaction = new Transaction();
+        transaction.setSender(nodeAddress.toString());
+        transaction.setReceiver(this.miner);
+        transaction.setAmount(10);
+        transactions.add(transaction);
+    }
+
 }
