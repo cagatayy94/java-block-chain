@@ -30,7 +30,7 @@ public class Blockchain {
         block.setTimestamp(new Date().toString());
         block.setPreviousHash(previousHash);
         block.setProof(proof);
-        block.setTransactions(transactions);
+        block.setTransactions(new ArrayList(transactions));
         chain.add(block);
         return block;
     }
