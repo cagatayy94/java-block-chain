@@ -139,7 +139,7 @@ public class Blockchain {
                 chain = response.getBody().chain;
                 if (length > maxLength && isChainValid(chain)){
                     maxLength = length;
-                    this.chain = response.getBody().chain;
+                    longestChain = response.getBody().chain;
                 }
             }
         }
