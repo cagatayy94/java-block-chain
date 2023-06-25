@@ -2,6 +2,7 @@ package com.example.blockchainjava;
 
 import com.example.blockchainjava.entity.Block;
 import com.example.blockchainjava.entity.Blockchain;
+import com.example.blockchainjava.entity.response.ChainReplaceResponse;
 import com.example.blockchainjava.entity.response.ChainResponse;
 import com.example.blockchainjava.entity.Transaction;
 import com.example.blockchainjava.entity.response.ConnectNodeResponse;
@@ -80,5 +81,18 @@ public class DefaultController extends ControllerAdvice{
         response.setNodes(nodes);
 
         return ResponseEntity.ok(response) ;
+    }
+
+    @GetMapping("replace_chain")
+    public ResponseEntity<ChainReplaceResponse> replaceChain(){
+        boolean isReplaced = blockchain.replaceChain();
+        ChainReplaceResponse chainReplaceResponse = new ChainReplaceResponse();
+        if (isReplaced){
+            chainReplaceResponse.setMessage("The nodes had different chain so the chain was replaced by longest chain.");
+            chainReplaceResponse.setChain(blockchain.chain);
+        }else {
+            chainReplaceResponse.setMessage("All good chain is the largest one.");
+        }
+        return ResponseEntity.ok().body(chainReplaceResponse);
     }
 }
