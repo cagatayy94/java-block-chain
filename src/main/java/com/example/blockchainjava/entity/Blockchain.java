@@ -129,7 +129,7 @@ public class Blockchain {
         Long length;
 
         for (URL url:nodes) {
-            String address = url.getAuthority()+"/api/chain";
+            String address = url.toString()+"/api/chain";
 
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<ChainResponse> response = restTemplate.getForEntity(address, ChainResponse.class);
@@ -139,7 +139,7 @@ public class Blockchain {
                 chain = response.getBody().chain;
                 if (length > maxLength && isChainValid(chain)){
                     maxLength = length;
-                    longestChain = chain;
+                    this.chain = response.getBody().chain;
                 }
             }
         }
