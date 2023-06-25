@@ -104,7 +104,7 @@ public class Blockchain {
     }
 
     public void addNode(URL url){
-        if (this.nodes.stream().noneMatch(x -> x == url)){
+        if (this.nodes.isEmpty() || this.nodes.stream().noneMatch(x -> x == url)){
             this.nodes.add(url);
         }
     }
